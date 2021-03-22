@@ -20,6 +20,23 @@ namespace Infrastructure.Data
                 query = query.Where(spec.Criteria);
             }
 
+            if (spec.OrderBy != null)
+            {
+                query = query.OrderBy(spec.OrderBy);
+            }
+
+            if (spec.OrderByDescending != null)
+            {
+                query = query.OrderByDescending(spec.OrderByDescending);
+            }
+
+            // for pagination
+            // this pagination needs to come after we apply the other filters so the order in here matters and this should be after them
+            if (spec.IsPagingEnabled)
+            {
+                query = query.Skip(spec.Skip).Take(spec.Take);
+            }
+
             // our include is cummuliated so we use Aggregate
             // like .Include(p => p.ProductType).Include(p => p.ProductBrand)
             query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
